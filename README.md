@@ -18,7 +18,8 @@ hankchow(at)hankchow(dot)net
 
 ### How to run it
 1. Git-clone these codes.
-2. Run it with a certain string as argument. If no strings are given, it will take current time as its argument.
+2. Create a directory named "history", or it might crush.
+3. Run it with a certain string as argument. If no strings are given, it will take current time as its argument.
 
 ## About this program
 It is not perfect and lack of robustness in the first published version. 
