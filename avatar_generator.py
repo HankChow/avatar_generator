@@ -4,6 +4,7 @@ import random
 import md5
 import sys
 import time
+import os
 
 class avatar_generator:
 	
@@ -161,4 +162,7 @@ if __name__ == '__main__':
 	meta = ag.meta_generator(ag.str2meta(sys.argv[1]))
 	avatar = ag.avatar_generator(meta)
 	avatar.show()
-	avatar.save("history/" + sys.argv[1] + ".jpg", "JPEG")
+	if not os.path.exists('history/'):
+		os.makedirs('history/')
+	if not os.path.exists('history/' + sys.argv[1] + '.jpg')
+		avatar.save('history/' + sys.argv[1] + '.jpg', 'JPEG')
