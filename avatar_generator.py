@@ -157,12 +157,12 @@ class avatar_generator:
 	
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
-		sys.argv.append(str(int(time.time())))
+		sys.argv.append(str(time.time()))
 	ag = avatar_generator()
 	meta = ag.meta_generator(ag.str2meta(sys.argv[1]))
 	avatar = ag.avatar_generator(meta)
 	avatar.show()
 	if not os.path.exists('history/'):
 		os.makedirs('history/')
-	if not os.path.exists('history/' + sys.argv[1] + '.jpg')
+	if not os.path.exists('history/' + sys.argv[1] + '.jpg'):
 		avatar.save('history/' + sys.argv[1] + '.jpg', 'JPEG')
