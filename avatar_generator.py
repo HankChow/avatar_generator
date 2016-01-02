@@ -68,7 +68,6 @@ class avatar_generator:
 					y_count += 1
 				y_count = 0
 				x_count += 1
-			print avatarInfo['symmetry_method']
 			return {'meta' : meta, 'sym_info' : avatarInfo['symmetry_method']}
 		else:
 			meta = Image.new('RGB', (x_len / 2, y_len))
@@ -85,7 +84,6 @@ class avatar_generator:
 					y_count += 1
 				y_count = 0
 				x_count += 1
-			print avatarInfo['symmetry_method']
 			return {'meta' : meta, 'sym_info' : avatarInfo['symmetry_method']}
 
 	def random_meta_generator(self, x_len = 200, y_len = 200, block_len = 50):
