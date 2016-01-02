@@ -68,22 +68,24 @@ class avatar_generator:
 					y_count += 1
 				y_count = 0
 				x_count += 1
+			print avatarInfo['symmetry_method']
 			return {'meta' : meta, 'sym_info' : avatarInfo['symmetry_method']}
 		else:
-			meta = Image.new('RGB', (x_len, y_len / 2))
+			meta = Image.new('RGB', (x_len / 2, y_len))
 			blocks = ImageDraw.Draw(meta)
 			x_count = 0
 			y_count = 0
-			for x in range(0, x_len, block_len):
-				for y in range(0, y_len / 2, block_len):
+			for x in range(0, x_len / 2, block_len):
+				for y in range(0, y_len, block_len):
 					blocks_poly = [(x, y), (x + block_len, y), (x + block_len, y + block_len), (x, y + block_len)]
-					if avatarInfo['avatarDetails'][x_count][y_count] == '0':
+					if avatarInfo['avatarDetails'][y_count][x_count] == '0':
 						blocks.polygon(blocks_poly, fill = avatarInfo['background'])
 					else:
 						blocks.polygon(blocks_poly, fill = avatarInfo['foreground'])
 					y_count += 1
 				y_count = 0
 				x_count += 1
+			print avatarInfo['symmetry_method']
 			return {'meta' : meta, 'sym_info' : avatarInfo['symmetry_method']}
 
 	def random_meta_generator(self, x_len = 200, y_len = 200, block_len = 50):
@@ -111,14 +113,14 @@ class avatar_generator:
 			avatar = self.quad_centrosymmetry(meta['meta'])
 		return avatar
 	
-	def x_axial_symmetry(self, meta):
+	def y_axial_symmetry(self, meta):
 		avatar = Image.new('RGB', (meta.size[0], meta.size[1] * 2))
 		avatar.paste(meta, (0, 0))
 		trans = meta.transpose(Image.FLIP_TOP_BOTTOM)
 		avatar.paste(trans, (0, meta.size[1]))
 		return avatar
 	
-	def y_axial_symmetry(self, meta):
+	def x_axial_symmetry(self, meta):
 		avatar = Image.new('RGB', (meta.size[0] * 2, meta.size[1]))
 		avatar.paste(meta, (0, 0))
 		trans = meta.transpose(Image.FLIP_LEFT_RIGHT)
@@ -126,9 +128,9 @@ class avatar_generator:
 		return avatar
 	
 	def semi_centrosymmetry(self, meta):
-		avatar = Image.new('RGB', (meta.size[0], meta.size[1] * 2))
+		avatar = Image.new('RGB', (meta.size[0] * 2, meta.size[1]))
 		avatar.paste(meta, (0, 0))
-		avatar.paste(meta.rotate(180), (0, meta.size[1]))
+		avatar.paste(meta.rotate(180), (meta.size[0], 0))
 		return avatar
 	
 	def quad_centrosymmetry(self, meta):
