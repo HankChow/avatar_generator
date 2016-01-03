@@ -15,7 +15,7 @@ hankchow(at)hankchow(dot)net
 
 ### What it needs
 - Python 2.7 (Maybe it works in order versions of Python)
-- PIL(AKA. Python Image Library)
+- PIL (AKA. Python Image Library)
 
 ### How to run it
 1. Git-clone these codes.
