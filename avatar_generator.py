@@ -4,6 +4,7 @@ import random
 import hashlib
 import time
 import math
+import ConfigParser
 
 class avatar_generator:
 	
@@ -369,6 +370,17 @@ class avatar_generator:
 		return distance
 
 if __name__ == '__main__':
+	
+	try:
+		cf = ConfigParser.ConfigParser()
+		cf.read('config.ini')
+		cf_history = cf.get('options', 'history')
+		if cf_history.lower() not in ['on', 'off']:
+			exit()
+	except:
+		print "The file config.ini should be modified correctly before running the program."
+		exit()
+
 	if len(sys.argv) < 2:
 		sys.argv.append(str(time.time()))
 	ag = avatar_generator()
@@ -381,7 +393,8 @@ if __name__ == '__main__':
 	avatar = ag.avatar_generator(meta)
 	avatar.show()
 
-	if not os.path.exists('history/'):
-		os.makedirs('history/')
-	if not os.path.exists('history/' + sys.argv[1] + '.jpg'):
-		avatar.save('history/' + sys.argv[1] + '.jpg', 'JPEG')
+	if cf_history.lower() == 'on':
+		if not os.path.exists('history/'):
+			os.makedirs('history/')
+		if not os.path.exists('history/' + sys.argv[1] + '.jpg'):
+			avatar.save('history/' + sys.argv[1] + '.jpg', 'JPEG')
