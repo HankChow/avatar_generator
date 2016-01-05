@@ -8,6 +8,31 @@ import ConfigParser
 
 class avatar_generator:
 	
+	def readConfig(self):
+		cf_history = ''
+		cf_triangle = ''
+		
+		try:
+			cf = ConfigParser.ConfigParser()
+			cf.read('config.ini')
+			cf_history = cf.get('options', 'history')
+			cf_triangle = cf.get('options', 'triangle')
+		except:
+			print "The file config.ini should be modified correctly before running the program."
+			exit()
+		
+		if cf_history.lower() not in ['on', 'off']:
+			print "The file config.ini should be modified correctly before running the program."
+			exit()
+		if cf_triangle.lower() not in ['on', 'off']:
+			print "The file config.ini should be modified correctly before running the program."
+			exit()
+		userConfig = {
+		'history' : cf_history, 
+		'triangle' : cf_triangle
+		}
+		
+		return userConfig
 	
 	def str2meta_md5(self, string):
 
@@ -72,13 +97,13 @@ class avatar_generator:
 		return metaInfo
 	
 	
-	def str2meta_sha256(self, string):
+	def str2meta_sha384(self, string):
 		
-		sha256str = hashlib.sha256(string).hexdigest()
+		sha384str = hashlib.sha384(string).hexdigest()
 		
-		color1 = eval('0x' + sha256str[-6:])
-		color2 = eval('0x' + sha256str[-12:-6])
-		color3 = eval('0x' + sha256str[-18:-12])
+		color1 = eval('0x' + sha384str[-6:])
+		color2 = eval('0x' + sha384str[-12:-6])
+		color3 = eval('0x' + sha384str[-18:-12])
 		darkest = 0
 		lightest = 0
 		distance1 = self.cal_distance(color2, color3)
@@ -95,7 +120,7 @@ class avatar_generator:
 			lightest = max(color1, color2)
 		foreground = 0
 		background = 0
-		if eval('0x' + sha256str[-19]) % 2 == 0:
+		if eval('0x' + sha384str[-19]) % 2 == 0:
 			foreground = darkest
 			background = lightest
 		else:
@@ -120,35 +145,51 @@ class avatar_generator:
 		'e' : 'semi_centrosymmetry_nesting_x_axial_symmetry',
 		'f' : 'semi_centrosymmetry_nesting_semi_centrosymmtry'
 		}
-		symmetry_method = symmetry_dic[sha256str[-20]]
+		symmetry_method = symmetry_dic[sha384str[-20]]
 		
 		metaDetails = []
-		sha256_block = []
+		triangleDetails = []
+		triangleOrients = []
+		sha384_block = []
 		for i in range(0, 16):
-			sha256_block.append(sha256str[(i * 3):((i + 1) * 3)])
+			sha384_block.append(sha384str[(i * 6):((i + 1) * 6)])
 		if symmetry_method in ['non_nesting_quad_centrosymmetry', 'non_nesting_counter_quad_centrosymmetry']:
 			for i in range(0, 8):
-				metaDetails.append(str(bin(eval('0x' + sha256_block[i][1])))[2:].zfill(4) + str(bin(eval('0x' + sha256_block[i + 8][1])))[2:].zfill(4))
+				metaDetails.append(str(bin(eval('0x' + sha384_block[i][0])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][0])))[2:].zfill(4))
+				triangleDetails.append(str(bin(eval('0x' + sha384_block[i][2])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][2])))[2:].zfill(4))
+				triangleOrients.append(str(bin(eval('0x' + sha384_block[i][3])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][3])))[2:].zfill(4))
 		elif symmetry_method in ['non_nesting_x_axial_symmetry', 'non_nesting_semi_centrosymmetry']:
 			for i in range(0, 8):
-				metaDetails.append(str(bin(eval('0x' + sha256_block[i][0])))[2:].zfill(4) + str(bin(eval('0x' + sha256_block[i + 8][0])))[2:].zfill(4))
-				metaDetails.append(str(bin(eval('0x' + sha256_block[i][2])))[2:].zfill(4) + str(bin(eval('0x' + sha256_block[i + 8][2])))[2:].zfill(4))
+				metaDetails.append(str(bin(eval('0x' + sha384_block[i][0])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][0])))[2:].zfill(4))
+				metaDetails.append(str(bin(eval('0x' + sha384_block[i][1])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][1])))[2:].zfill(4))
+				triangleDetails.append(str(bin(eval('0x' + sha384_block[i][2])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][2])))[2:].zfill(4))
+				triangleDetails.append(str(bin(eval('0x' + sha384_block[i][3])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][3])))[2:].zfill(4))
+				triangleOrients.append(str(bin(eval('0x' + sha384_block[i][4])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][4])))[2:].zfill(4))
+				triangleOrients.append(str(bin(eval('0x' + sha384_block[i][5])))[2:].zfill(4) + str(bin(eval('0x' + sha384_block[i + 8][5])))[2:].zfill(4))
 		elif symmetry_method in ['quad_centrosymmetry_nesting_x_axial_symmetry', 'quad_centrosymmetry_nesting_semi_centrosymmetry', 'counter_quad_centrosymmetry_nesting_x_axial_symmetry', 'counter_quad_centrosymmetry_nesting_semi_centrosymmetry', 'x_axial_symmetry_nesting_x_axial_symmetry', 'x_axial_symmetry_nesting_semi_centrosymmetry', 'semi_centrosymmetry_nesting_x_axial_symmetry', 'semi_centrosymmetry_nesting_semi_centrosymmtry']:
 			for i in range(0, 4):
-				metaDetails.append(str(bin(eval('0x' + sha256_block[i][0])))[2:].zfill(4))
-				metaDetails.append(str(bin(eval('0x' + sha256_block[i][2])))[2:].zfill(4))
+				metaDetails.append(str(bin(eval('0x' + sha384_block[i][0])))[2:].zfill(4))
+				metaDetails.append(str(bin(eval('0x' + sha384_block[i][1])))[2:].zfill(4))
+				triangleDetails.append(str(bin(eval('0x' + sha384_block[i][2])))[2:].zfill(4))
+				triangleDetails.append(str(bin(eval('0x' + sha384_block[i][3])))[2:].zfill(4))
+				triangleOrients.append(str(bin(eval('0x' + sha384_block[i][4])))[2:].zfill(4))
+				triangleOrients.append(str(bin(eval('0x' + sha384_block[i][5])))[2:].zfill(4))
 		elif symmetry_method in ['quad_centrosymmetry_nesting_quad_centrosymmetry', 'quad_centrosymmetry_nesting_counter_quad_centrosymmetry', 'counter_quad_centrosymmetry_nesting_quad_centrosymmetry', 'counter_quad_centrosymmetry_nesting_counter_quad_centrosymmetry']:
 			for i in range(0, 4):
-				metaDetails.append(str(bin(eval('0x' + sha256_block[i][1])))[2:].zfill(4))
+				metaDetails.append(str(bin(eval('0x' + sha384_block[i][0])))[2:].zfill(4))
+				triangleDetails.append(str(bin(eval('0x' + sha384_block[i][2])))[2:].zfill(4))
+				triangleOrients.append(str(bin(eval('0x' + sha384_block[i][4])))[2:].zfill(4))
 		
 		metaInfo = {
 		'metaDetails' : metaDetails, 
+		'triangleDetails' : triangleDetails, 
+		'triangleOrients' : triangleOrients, 
 		'symmetry_method' : symmetry_method, 
 		'foreground' : foreground, 
 		'background' : background, 
-		'hash' : 'sha256'
+		'hash' : 'sha384'
 		}
-		
+
 		return metaInfo
 		
 	
@@ -185,11 +226,24 @@ class avatar_generator:
 							blocks.polygon(blocks_poly, fill = metaInfo['background'])
 						else:
 							blocks.polygon(blocks_poly, fill = metaInfo['foreground'])
+						### Adding triangles begin ###
+						if metaInfo['triangleDetails'][y_count][x_count] == '1':
+							if metaInfo['triangleOrients'][y_count][x_count] == '0':
+								if metaInfo['metaDetails'][y_count][x_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+							else:
+								if metaInfo['metaDetails'][y_count][x_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+						### Adding traangles end   ###
 						y_count += 1
 					y_count = 0
 					x_count += 1
 				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'md5'}
-		elif metaInfo['hash'] == 'sha256':
+		elif metaInfo['hash'] == 'sha384':
 			block_len /= 2
 			if metaInfo['symmetry_method'] in ['quad_centrosymmetry_nesting_quad_centrosymmetry', 'quad_centrosymmetry_nesting_counter_quad_centrosymmetry', 'counter_quad_centrosymmetry_nesting_quad_centrosymmetry', 'counter_quad_centrosymmetry_nesting_counter_quad_centrosymmetry']:
 				meta = Image.new('RGB', (x_len / 4, y_len / 4))
@@ -203,10 +257,23 @@ class avatar_generator:
 							blocks.polygon(blocks_poly, fill = metaInfo['background'])
 						else:
 							blocks.polygon(blocks_poly, fill = metaInfo['foreground'])
+						### Adding triangles begin ###
+						if metaInfo['triangleDetails'][x_count][y_count] == '1':
+							if metaInfo['triangleOrients'][x_count][y_count] == '0':
+								if metaInfo['metaDetails'][x_count][y_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+							else:
+								if metaInfo['metaDetails'][x_count][y_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+						### Adding traangles end   ###
 						y_count += 1
 					y_count = 0
 					x_count += 1
-				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha256'}
+				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha384'}
 			elif metaInfo['symmetry_method'] in ['quad_centrosymmetry_nesting_x_axial_symmetry', 'quad_centrosymmetry_nesting_semi_centrosymmetry', 'counter_quad_centrosymmetry_nesting_x_axial_symmetry', 'counter_quad_centrosymmetry_nesting_semi_centrosymmetry', 'x_axial_symmetry_nesting_x_axial_symmetry', 'x_axial_symmetry_nesting_semi_centrosymmetry', 'semi_centrosymmetry_nesting_x_axial_symmetry', 'semi_centrosymmetry_nesting_semi_centrosymmtry']:
 				meta = Image.new('RGB', (x_len / 4, y_len / 2))
 				blocks = ImageDraw.Draw(meta)
@@ -219,10 +286,23 @@ class avatar_generator:
 							blocks.polygon(blocks_poly, fill = metaInfo['background'])
 						else:
 							blocks.polygon(blocks_poly, fill = metaInfo['foreground'])
+						### Adding triangles begin ###
+						if metaInfo['triangleDetails'][y_count][x_count] == '1':
+							if metaInfo['triangleOrients'][y_count][x_count] == '0':
+								if metaInfo['metaDetails'][y_count][x_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+							else:
+								if metaInfo['metaDetails'][y_count][x_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+						### Adding traangles end   ###
 						y_count += 1
 					y_count = 0
 					x_count += 1
-				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha256'}
+				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha384'}
 			elif metaInfo['symmetry_method'] in ['non_nesting_quad_centrosymmetry', 'non_nesting_counter_quad_centrosymmetry']:
 				meta = Image.new('RGB', (x_len / 2, y_len / 2))
 				blocks = ImageDraw.Draw(meta)
@@ -235,10 +315,23 @@ class avatar_generator:
 							blocks.polygon(blocks_poly, fill = metaInfo['background'])
 						else:
 							blocks.polygon(blocks_poly, fill = metaInfo['foreground'])
+						### Adding triangles begin ###
+						if metaInfo['triangleDetails'][x_count][y_count] == '1':
+							if metaInfo['triangleOrients'][x_count][y_count] == '0':
+								if metaInfo['metaDetails'][x_count][y_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+							else:
+								if metaInfo['metaDetails'][x_count][y_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+						### Adding traangles end   ###
 						y_count += 1
 					y_count = 0
 					x_count += 1
-				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha256'}
+				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha384'}
 			elif metaInfo['symmetry_method'] in ['non_nesting_x_axial_symmetry', 'non_nesting_semi_centrosymmetry']:
 				meta = Image.new('RGB', (x_len / 2, y_len))
 				blocks = ImageDraw.Draw(meta)
@@ -251,10 +344,23 @@ class avatar_generator:
 							blocks.polygon(blocks_poly, fill = metaInfo['background'])
 						else:
 							blocks.polygon(blocks_poly, fill = metaInfo['foreground'])
+						### Adding triangles begin ###
+						if metaInfo['triangleDetails'][y_count][x_count] == '1':
+							if metaInfo['triangleOrients'][y_count][x_count] == '0':
+								if metaInfo['metaDetails'][y_count][x_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+							else:
+								if metaInfo['metaDetails'][y_count][x_count] == '0':
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['background']))
+								else:
+									blocks.polygon([(x, y), (x + block_len, y), (x + block_len, y + block_len)], fill = self.inverseColor(metaInfo['foreground']))
+						### Adding traangles end   ###
 						y_count += 1
 					y_count = 0
 					x_count += 1
-				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha256'}
+				return {'meta' : meta, 'sym_info' : metaInfo['symmetry_method'], 'hash' : 'sha384'}
 
 
 	def random_meta_generator(self, x_len = 200, y_len = 200, block_len = 50):
@@ -287,7 +393,7 @@ class avatar_generator:
 				avatar = self.semi_centrosymmetry(meta['meta'])
 			elif meta['sym_info'] == 'quad_centrosymmetry':
 				avatar = self.quad_centrosymmetry(meta['meta'])
-		elif meta['hash'] == 'sha256':
+		elif meta['hash'] == 'sha384':
 			if meta['sym_info'] in ['non_nesting_x_axial_symmetry', 'quad_centrosymmetry_nesting_x_axial_symmetry', 'counter_quad_centrosymmetry_nesting_x_axial_symmetry', 'x_axial_symmetry_nesting_x_axial_symmetry', 'semi_centrosymmetry_nesting_x_axial_symmetry']:
 				avatar = self.x_axial_symmetry(meta['meta'])
 			if meta['sym_info'] in ['non_nesting_semi_centrosymmetry', 'quad_centrosymmetry_nesting_semi_centrosymmetry', 'counter_quad_centrosymmetry_nesting_semi_centrosymmetry', 'x_axial_symmetry_nesting_semi_centrosymmetry', 'semi_centrosymmetry_nesting_semi_centrosymmtry']:
@@ -301,10 +407,10 @@ class avatar_generator:
 			if meta['sym_info'] in ['counter_quad_centrosymmetry_nesting_x_axial_symmetry', 'counter_quad_centrosymmetry_nesting_semi_centrosymmetry', 'counter_quad_centrosymmetry_nesting_quad_centrosymmetry', 'counter_quad_centrosymmetry_nesting_counter_quad_centrosymmetry']:
 				avatar = self.counter_quad_centrosymmetry(avatar)
 			if meta['sym_info'] in ['x_axial_symmetry_nesting_x_axial_symmetry', 'x_axial_symmetry_nesting_semi_centrosymmetry']:
-				avatar = self.y_axial_symmetry(avatar)
+				avatar = self.vertical_semi_centrosymmetry(avatar)
 				avatar = self.x_axial_symmetry(avatar)
 			if meta['sym_info'] in ['semi_centrosymmetry_nesting_x_axial_symmetry', 'semi_centrosymmetry_nesting_semi_centrosymmtry']:
-				avatar = self.y_axial_symmetry(avatar)
+				avatar = self.vertical_semi_centrosymmetry(avatar)
 				avatar = self.semi_centrosymmetry(avatar)
 		
 		return avatar
@@ -326,6 +432,14 @@ class avatar_generator:
 		trans = meta.transpose(Image.FLIP_LEFT_RIGHT)
 		avatar.paste(trans, (meta.size[0], 0))
 		
+		return avatar
+
+	def vertical_semi_centrosymmetry(self, meta):
+		
+		avatar = Image.new('RGB', (meta.size[0], meta.size[1] * 2))
+		avatar.paste(meta, (0, 0))
+		avatar.paste(meta.rotate(180), (0, meta.size[1]))
+
 		return avatar
 	
 	def semi_centrosymmetry(self, meta):
@@ -369,31 +483,31 @@ class avatar_generator:
 		
 		return distance
 
+	def inverseColor(self, color):
+
+		color_hex = (str(hex(color))[2:]).zfill(6)
+		red_hex = color_hex[:2]
+		green_hex = color_hex[2:4]
+		blue_hex = color_hex[4:6]
+		inverse = int('0x' + str(hex(255 - int('0x' + red_hex, 16)))[2:] + str(hex(255 - int('0x' + green_hex, 16)))[2:] + str(hex(255 - int('0x' + blue_hex, 16)))[2:], 16)
+
+		return inverse
+
 if __name__ == '__main__':
-	
-	try:
-		cf = ConfigParser.ConfigParser()
-		cf.read('config.ini')
-		cf_history = cf.get('options', 'history')
-		if cf_history.lower() not in ['on', 'off']:
-			exit()
-	except:
-		print "The file config.ini should be modified correctly before running the program."
-		exit()
 
 	if len(sys.argv) < 2:
 		sys.argv.append(str(time.time()))
 	ag = avatar_generator()
-	
+	config = ag.readConfig()
 	meta = ''
 	if len(sys.argv) >= 3:
 		meta = ag.meta_generator(ag.str2meta_md5(sys.argv[1]))
 	else:
-		meta = ag.meta_generator(ag.str2meta_sha256(sys.argv[1]))
+		meta = ag.meta_generator(ag.str2meta_sha384(sys.argv[1]))
 	avatar = ag.avatar_generator(meta)
 	avatar.show()
 
-	if cf_history.lower() == 'on':
+	if config['history'] == 'on':
 		if not os.path.exists('history/'):
 			os.makedirs('history/')
 		if not os.path.exists('history/' + sys.argv[1] + '.jpg'):
