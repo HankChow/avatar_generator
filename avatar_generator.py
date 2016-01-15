@@ -18,14 +18,14 @@ class avatar_generator:
 			cf_history = cf.get('options', 'history')
 			cf_triangle = cf.get('options', 'triangle')
 		except:
-			print "The file config.ini should be modified correctly before running the program."
+			self.showMessage("The file config.ini should be modified correctly before running the program.")
 			exit()
 		
 		if cf_history.lower() not in ['on', 'off']:
-			print "The file config.ini should be modified correctly before running the program."
+			self.showMessage("The file config.ini should be modified correctly before running the program.")
 			exit()
 		if cf_triangle.lower() not in ['on', 'off']:
-			print "The file config.ini should be modified correctly before running the program."
+			self.showMessage("The file config.ini should be modified correctly before running the program.")
 			exit()
 		userConfig = {
 		'history' : cf_history, 
@@ -492,6 +492,10 @@ class avatar_generator:
 		inverse = int('0x' + str(hex(255 - int('0x' + red_hex, 16)))[2:] + str(hex(255 - int('0x' + green_hex, 16)))[2:] + str(hex(255 - int('0x' + blue_hex, 16)))[2:], 16)
 
 		return inverse
+
+	def showMessage(self, message = ""):
+
+		print message
 
 if __name__ == '__main__':
 
